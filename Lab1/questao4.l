@@ -2,10 +2,9 @@
 #define ACEITA  1
 #define     OUTRA   2
 %}
-carac       [0-1]
 delim       [ \t\n\r]
 ws          {delim}+
-aceita      
+aceita      (0*10*10*10*10*10*)*
 string      [^ \t\n\r]+
 %%
 {ws}        { ;}

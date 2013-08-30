@@ -1,0 +1,133 @@
+Terminals unused in grammar
+
+   a
+   b
+   c
+   dolar
+   erro
+
+
+State 3 conflicts: 1 reduce/reduce
+
+
+Grammar
+
+    0 $accept: SS $end
+
+    1 SS: S '$'
+
+    2 S: /* empty */
+
+    3 $@1: /* empty */
+
+    4 S: $@1 S '(' S ')'
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+'$' (36) 1
+'(' (40) 4
+')' (41) 4
+error (256)
+a (258)
+b (259)
+c (260)
+dolar (261)
+erro (262)
+
+
+Nonterminals, with rules where they appear
+
+$accept (11)
+    on left: 0
+SS (12)
+    on left: 1, on right: 0
+S (13)
+    on left: 2 4, on right: 1 4
+$@1 (14)
+    on left: 3, on right: 4
+
+
+state 0
+
+    0 $accept: . SS $end
+
+    '('       reduce using rule 3 ($@1)
+    $default  reduce using rule 2 (S)
+
+    SS   go to state 1
+    S    go to state 2
+    $@1  go to state 3
+
+
+state 1
+
+    0 $accept: SS . $end
+
+    $end  shift, and go to state 4
+
+
+state 2
+
+    1 SS: S . '$'
+
+    '$'  shift, and go to state 5
+
+
+state 3
+
+    4 S: $@1 . S '(' S ')'
+
+    '('       reduce using rule 2 (S)
+    '('       [reduce using rule 3 ($@1)]
+    $default  reduce using rule 2 (S)
+
+    S    go to state 6
+    $@1  go to state 3
+
+
+state 4
+
+    0 $accept: SS $end .
+
+    $default  accept
+
+
+state 5
+
+    1 SS: S '$' .
+
+    $default  reduce using rule 1 (SS)
+
+
+state 6
+
+    4 S: $@1 S . '(' S ')'
+
+    '('  shift, and go to state 7
+
+
+state 7
+
+    4 S: $@1 S '(' . S ')'
+
+    '('       reduce using rule 3 ($@1)
+    $default  reduce using rule 2 (S)
+
+    S    go to state 8
+    $@1  go to state 3
+
+
+state 8
+
+    4 S: $@1 S '(' S . ')'
+
+    ')'  shift, and go to state 9
+
+
+state 9
+
+    4 S: $@1 S '(' S ')' .
+
+    $default  reduce using rule 4 (S)

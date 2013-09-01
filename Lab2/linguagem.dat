@@ -1,3 +1,45 @@
-var int  xxx  123  12.53  13.  31.5E-12  1.5e11
-19.E+27  ';' '\'' '\n' 's'  "ab \\ \" \n'z"   '"'   "'"
-/* texto xx 123 */ var enquanto verdade chamar yy
+funcao teste(int a, int v, int j){
+	enquanto (x != 3 || x = 1 && !y=4) {
+		escrever(x);
+		x++;
+		/* Comentario aqui, ignorar */
+		if(verdade){
+			y[2] := 10;
+		}
+
+		se(2>1 && 3>=2 || 1!=2)
+			escrever("funcionando")
+		senao
+			retornar
+		int z := 1;
+		int w := 3;
+		int omega := z + w - 1;
+		int multiplicacao := z*w/2
+		int resto := z%w;
+		int nao := ~z;
+		cadeia cad := "abcdsw";
+		carac um := cad[1]; /*comentario aqui*/
+
+		carac c := 'a';
+		int n := 4;
+		real r := 2.3;
+		chamar teste();
+		ler
+		repetir
+		enquanto
+		logic lol := verdade;
+		logic lll := falso;
+		/*retornar*/
+		/* codigo comentado joga fora*/
+		escrever
+		para
+		se
+		procedimento
+		senao
+		programa
+		var nome := 2;
+		cadeia string := "abcd";
+	}
+	$ /*caractere invalido*/
+	# /* mais um*/
+}

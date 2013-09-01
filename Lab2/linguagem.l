@@ -74,22 +74,22 @@ ctreal          {digito}+\.{digito}*([Ee][+-]?{digito}+)?
 carac1          \\.|[^\\']
 carac2          \\.|[^\\\"]
 ctcarac         '{carac1}'
-string          \"{carac2}*\"
-Prog            {programa} {ID} {PVIRG} {Decls} {SubProgs} {CmdComp}
+cadeia          \"{carac2}*\"
+Prog            {programa} {id} {PVIRG} {Decls} {SubProgs} {CmdComp}
 Decls           ({var} {ListDecl})?
 ListDecl        {Declaracao} | {ListDecl} {Declaracao}
 Declaracao      {Tipo} {ListElemDecl} {PVIRG}
 Tipo            {int} | {real} | {carac} | {logic}
 ListElemDecl    {ElemDecl} | {ListElemDecl} {VIRG} {ElemDecl}
-ElemDecl        {ID} | {ID} {ABCOL} {ListDim} {FCOL}
+ElemDecl        {id} | {id} {ABCOL} {ListDim} {FCOL}
 ListDim         {CINT} | {ListDim} {VIRG} {CINT}
 SubProgs        ({SubProgrs}  {DeclSubProg})?
 DeclSubProg     {Cabecalho}   {Decls}   {CmdComp}
 Cabecalho       {CabFunc} | {CabProc}
-CabFunc         {funcao}   {Tipo}   {ID}   {ABPAR}   {FPAR}   {PVIRG} | {funcao} {Tipo} {ID} {ABPAR} {ListParam} {FPAR} {PVIRG}
-CabProc         {procedimento} {ID} {ABPAR} {FPAR} {PVIRG} | {procedimento} {ID} {ABPAR} {ListParam} {FPAR} {PVIRG}
+CabFunc         {funcao}   {Tipo}   {id}   {ABPAR}   {FPAR}   {PVIRG} | {funcao} {Tipo} {id} {ABPAR} {ListParam} {FPAR} {PVIRG}
+CabProc         {procedimento} {id} {ABPAR} {FPAR} {PVIRG} | {procedimento} {id} {ABPAR} {ListParam} {FPAR} {PVIRG}
 ListParam       {Parametro}  |  {ListParam}   {VIRG}   {Parametro}
-Parametro       {Tipo}   {ID}
+Parametro       {Tipo}   {id}
 CmdComp         {ABCHAV}   {ListCmd}   {FCHAV}
 ListCmd         ({ListCmd}   {Comando})?
 Comando         {CmdComp} |  {CmdSe} | {CmdEnquanto} | {CmdRepetir} | {CmdPara} | {CmdLer} | {CmdEscrever} | {CmdAtrib} | {ChamaProc} | {CmdRetornar} | {PVIRG}
@@ -102,8 +102,8 @@ CmdLer          {ler} {ABPAR} {ListVar} {FPAR} {PVIRG}
 ListVar         {Variavel} |  {ListVar} {VIRG} {Variavel}
 CmdEscrever     {escrever} {ABPAR} {ListEscr}   {FPAR} {PVIRG}
 ListEscr        {ElemEscr} | {ListEscr} {VIRG} {ElemEscr}
-ElemEscr        {CADEIA} | {Expressao}
-ChamaProc       {chamar} {ID} {ABPAR} {FPAR} {PVIRG} | {chamar} {ID} {ABPAR} {ListExpr}   {FPAR}   {PVIRG}
+ElemEscr        {cadeia} | {Expressao}
+ChamaProc       {chamar} {id} {ABPAR} {FPAR} {PVIRG} | {chamar} {id} {ABPAR} {ListExpr}   {FPAR}   {PVIRG}
 CmdRetornar     {retornar}   {PVIRG} | {retornar}   {Expressao}   {PVIRG}
 CmdAtrib        {Variavel}   {ATRIB}   {Expressao}   {PVIRG}
 ListExpr        {Expressao} | {ListExpr}   {VIRG}   {Expressao}
@@ -113,10 +113,10 @@ ExprAux2        {ExprAux3} | {NOT}   {ExprAux3}
 ExprAux3        {ExprAux4} | {ExprAux4}   {OPREL}   {ExprAux4}
 ExprAux4        {Termo} | {ExprAux4}   {OPAD}   {Termo}
 Termo           {Fator} | {Termo}   {OPMULT}   {Fator}
-Fator           {Variavel} | {CTINT} | {CTREAL} | {CTCARAC} | {verdade} | {falso} | {NEG}  {Fator} | {ABPAR}  {Expressao}   {FPAR} | {ChamaFunc}
-Variavel        {ID} | {ID}   {ABCOL}   {ListSubscr}   {FCOL}
+Fator           {Variavel} | {CTINT} | {ctreal} | {ctcarac} | {verdade} | {falso} | {NEG}  {Fator} | {ABPAR}  {Expressao}   {FPAR} | {ChamaFunc}
+Variavel        {id} | {id}   {ABCOL}   {ListSubscr}   {FCOL}
 ListSubscr      {ExprAux4} | {ListSubscr}   {VIRG}   {ExprAux4}
-ChamaFunc       {ID}   {ABPAR}    {FPAR} |  {ID}   {ABPAR}   {ListExpr}  {FPAR}
+ChamaFunc       {id}   {ABPAR}    {FPAR} |  {id}   {ABPAR}   {ListExpr}  {FPAR}
 %%
 {ws}            { ;}
 carac           {return CARAC;}
@@ -141,13 +141,13 @@ var             {return VAR;}
 {id}            {strcpy (yylval.string, yytext); return ID;}
 {ctint}         {yylval.valor = atoi(yytext); return CTINT;}
 {ctcarac}       {strcpy (yylval.string, yytext); return CTCARAC;}
-{string}        {strcpy (yylval.string, yytext); return CADEIA;}
+{cadeia}        {strcpy (yylval.string, yytext); return CADEIA;}
 {ctreal}        {yylval.valreal = atof(yytext); return CTREAL;}
 "<"             {yylval.atr = LT; return OPREL;}
 "<="            {yylval.atr = LE; return OPREL;}
 ">"             {yylval.atr = GT; return OPREL;}
 ">="            {yylval.atr = GE; return OPREL;}
-"=="            {yylval.atr = EQ; return OPREL;}
+"="            {yylval.atr = EQ; return OPREL;}
 "!="            {yylval.atr = NE; return OPREL;}
 "!"             {return NOT;}
 "||"            {return OR;}
@@ -158,7 +158,16 @@ var             {return VAR;}
 "/"             {yylval.atr = DIV; return OPMULT;}
 "%"             {yylval.atr = RESTO; return OPMULT;}
 "~"             {return NEG;}
-"/*"            {comentario ();}
+"/*"            {comentario();}
+"["             {return ABCOL;}
+"]"             {return FCOL;}
+"{"             {return ABCHAVE;}
+"}"             {return FCHAVE;}
+"("             {return ABPAR;}
+")"             {return FPAR;}
+";"             {return PVIRG;}
+":="            {return ATRIB;}
+","             {return VIRG;}
 .               {yylval.carac = yytext[0]; return INVAL;}
 %%
 void comentario () {

@@ -1,0 +1,6 @@
+int a = 5;
+enquanto (a >= 0){
+    cadeia c = olaMundo;
+    escrever(c);
+    a = a - 1;
+}

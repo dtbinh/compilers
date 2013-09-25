@@ -1,0 +1,16 @@
+programa teste;
+
+var logic a, b, c;
+int x, y;
+funcao int teste();{
+    x := 5;
+    retornar x;
+}
+
+procedimento proc();{
+    x = 5;
+}
+
+{
+    
+}

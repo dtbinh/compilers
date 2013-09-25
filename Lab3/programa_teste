@@ -1,6 +1,1 @@
-int a = 5;
-enquanto (a >= 0){
-    cadeia c = olaMundo;
-    escrever(c);
-    a = a - 1;
-}
+programa teste;var logic a, b, c;int x, y;funcao int teste();{x := 5;retornar x;}funcao int func();{se (a && b && c){retornar d;} senao {retornar d+1;}}procedimento proc();{x := 5;y := x*3/2;a[2] := x;}{chamar proc();a := verdade;escrever(a, b, "isto");se (x=1){ler(x);} senao {ler(y);}{x := 3 +  teste(x, y);}enquanto(x>0){escrever(x);x := x -1;}repetir {a := verdade;} enquanto (x<3);}

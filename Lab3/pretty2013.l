@@ -7,7 +7,7 @@ id			{letra}({letra}|{digito})*
 %%
 {ws}		{ ;}
 {id}		{strcpy (yylval.cadeia, yytext); return ID;}
-{ctint}	{yylval.valint = atoi(yytext); return CTINT;}
+{ctint}	    {yylval.valint = atoi(yytext); return CTINT;}
 "+"		{yylval.atr = MAIS; return OPAD;}
 "-"		{yylval.atr = MENOS; return OPAD;}
 "("		{return ABPAR;}

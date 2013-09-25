@@ -23,13 +23,14 @@ int tab = 0;
 %token		<carac>		INVAL
 %%
 CmdComposto:	ABCHAV
-				{tabular (); printf ("\{\n"); tab++;} 			ListCmds FCHAV 
+				{tabular (); printf ("\{\n"); tab++;} 		
+				ListCmds FCHAV 
 				{tab--; tabular (); printf ("}\n");}
 			;
 ListCmds	:	Comando
 			|	ListCmds Comando
 			;
-Comando	:	CmdAtrib
+Comando		:	CmdAtrib
 			|	CmdComposto
 			;
 CmdAtrib 	:	ID {tabular (); printf ("%s ", $1);}

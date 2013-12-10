@@ -151,8 +151,8 @@ ElemDecl :  ID  {printf ("%s ", $1);
                     DeclaracaoRepetida ($1);
                 else
                     InsereSimb ($1, IDVAR, tipocorrente);
-                }
-         ;
+                };
+
 CmdComp :  ABCHAV   {printf ("{\n");}   ListCmd   FCHAV   {printf ("}\n");}
          ;
 ListCmd :
@@ -247,8 +247,8 @@ Variavel    :  ID   {printf ("%s ", $1);
                     if (simb == NULL) NaoDeclarado ($1);
                     else if (simb->tid != IDVAR) TipoInadequado ($1);
                     $$ = simb;
-                    }
-         ;
+                    };
+
 %%
 
 /* Inclusao do analisador lexico  */

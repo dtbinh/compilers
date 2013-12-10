@@ -37,6 +37,7 @@
 #define	NCLASSHASH	23
 #define	TRUE			1
 #define	FALSE			0
+#define MAXDIMS			10
 
 /*  Strings para nomes dos tipos de identificadores  */
 
@@ -54,8 +55,8 @@ typedef struct celsimb celsimb;
 typedef celsimb *simbolo;
 struct celsimb {
 	char *cadeia;
-	int tid, tvar;
-	char inic, ref;
+	int tid, tvar, ndims, dims[MAXDIMS+1];
+	char inic, ref, array;
 	simbolo prox;
 };
 

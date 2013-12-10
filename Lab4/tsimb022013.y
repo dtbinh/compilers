@@ -191,19 +191,28 @@ Comando  :  CmdComp
          |  CmdEscrever
          |  CmdAtrib
          ;
-CmdSe		:  SE   ABPAR   {printf ("se ( ");}   Expressao   FPAR
+CmdSe	:   SE   ABPAR   {printf ("se ( ");}   Expressao
+			{
+				if($4 != LOGICAL)
+					Incompatibilidade("Expressao nao logica na condicao do SE");
+			}
+			FPAR
 				{printf (")\n");}   Comando   CmdSenao
          ;
 CmdSenao	:
 			|  SENAO   {printf ("senao\n");}   Comando
          ;
 CmdEnquanto:	ENQUANTO   ABPAR   {printf ("enquanto ( ");}   Expressao
+				{
+					if($4 != LOGICAL)
+						Incompatibilidade("Expressao nao logica na condicao do ENQUANTO");
+				}
 				FPAR   {printf (")\n");}   Comando
          ;
 CmdLer	:  LER   ABPAR   {printf ("ler ( ");}   ListVar
 				FPAR   PVIRG   {printf (") ;\n");}
          ;
-ListVar	:  Variavel
+ListVar	:  Variavel {$1->inic = $1->ref = TRUE;}
 			|  ListVar   VIRG  {printf (", ");}   Variavel
          ;
 CmdEscrever:	ESCREVER   ABPAR   {printf ("escrever ( ");}   ListEscr
@@ -218,7 +227,15 @@ ElemEscr	:  CADEIA  {printf ("\"%s\" ", $1);}
 CmdAtrib :  Variavel  {
 					if  ($1 != NULL) $1->inic = $1->ref = TRUE;
 				}  ATRIB   {printf (":= ");}   Expressao
-				PVIRG   {printf (";\n");}
+				PVIRG   {
+					printf (";\n");
+					if ($1 != NULL)
+						if ((($1->tvar == INTEGER || $1->tvar ==CHAR)
+							&& ($5 == FLOAT || $5 == LOGICAL)) ||
+							($1->tvar == FLOAT && $5 == LOGICAL) ||
+							($1->tvar == LOGICAL && $5 != LOGICAL))
+							Incompatibilidade("Lado direito de comando de atribuicao improprio");
+				}
          ;
 Expressao:  ExprAux1
 			|  Expressao   OR   {printf ("|| ");}   ExprAux1  {

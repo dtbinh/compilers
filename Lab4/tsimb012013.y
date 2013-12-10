@@ -190,18 +190,37 @@ ExprAux4 :  Termo
             |  ExprAux4   OPAD   {
                 switch ($2) {
                 case MAIS: printf ("+ "); break;
-                  case MENOS: printf ("- "); break;
+                case MENOS: printf ("- "); break;
                }
             }  Termo
+            {
+                if ($1 != INTEGER && $1 != FLOAT && $1 != CHAR || $4 != INTEGER && $4!=FLOAT && $4!=CHAR)
+                    Incompatibilidade ("Operando improprio para operador aritmetico");
+                if ($1 == FLOAT || $4 == FLOAT) $$ = FLOAT;
+                else $$ = INTEGER;
+            }
          ;
 Termo   :  Fator
             |  Termo   OPMULT   {
                 switch ($2) {
                 case MULT: printf ("* "); break;
-                  case DIV: printf ("/ "); break;
-                  case RESTO: printf ("%% "); break;
+                case DIV: printf ("/ "); break;
+                case RESTO: printf ("%% "); break;
                }
             }   Fator
+            {switch($2){
+                case MULT:case DIV:
+                    if ($1 != INTEGER && $1 != FLOAT && $1 != CHAR || $4 != INTEGER && $4!=FLOAT && $4!=CHAR)
+                        Incompatibilidade ("Operando improprio para operador aritmetico");
+                    if ($1 == FLOAT || $4 == FLOAT) $$ = FLOAT;
+                    else $$ = INTEGER;
+                    break;
+                case RESTO:
+                    if ($1 != INTEGER && $1 != CHAR|| $4 != INTEGER && $4 != CHAR)
+                        Incompatibilidade("Operando improprio para operador resto");
+                    $$ = INTEGER;
+                    break;
+            }}
          ;
 Fator   :Variavel{
                 if ($1 != NULL){

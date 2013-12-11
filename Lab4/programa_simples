@@ -1,0 +1,24 @@
+programa simples;
+
+var logic a, b, c;
+int x, y;
+carac B[2,0], car[3], d;
+
+funcao int teste();{
+    x := 5;
+    retornar x;
+}
+
+procedimento proc();{
+    x := 5;
+    y :=2;
+}
+
+{
+	ler(car[2]);
+    a := verdade;
+    escrever(a, b, "isto");
+    {
+        x := 3 +  teste(x, y);
+    }
+}

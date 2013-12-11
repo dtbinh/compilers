@@ -35,7 +35,7 @@ programa        {return PROGRAMA;}
 var             {return VAR;}
 {id}            {strcpy (yylval.cadeia, yytext); return ID;}
 {ctint}         {yylval.valint = atoi(yytext); return CTINT;}
-{ctcarac}       {strcpy (yylval.cadeia, yytext); return CTCARAC;}
+{ctcarac}       {yylval.carac = yytext; return CTCARAC;}
 {cadeia}        {strcpy (yylval.cadeia, yytext); return CADEIA;}
 {ctreal}        {yylval.valreal = atof(yytext); return CTREAL;}
 "<"             {yylval.atr = LT; return OPREL;}

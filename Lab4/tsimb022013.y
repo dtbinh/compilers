@@ -97,8 +97,7 @@ void NaoEsperado (char *);
 
 /* Declaracao dos atributos dos tokens e dos nao-terminais */
 
-%type       <tipoexpr>  Expressao  ExprAux1 ExprAux2
-                                ExprAux3   ExprAux4   Termo   Fator
+%type       <tipoexpr>  Expressao  ExprAux1 ExprAux2 ExprAux3   ExprAux4   Termo   Fator
 %type           <simb>      Variavel
 %type       <nsubscr>       ListSubscr
 %token      <cadeia>        ID

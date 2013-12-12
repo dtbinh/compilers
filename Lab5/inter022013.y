@@ -369,10 +369,19 @@ CmdSenao	:
          }
          ;
 CmdEnquanto:	ENQUANTO
+               {$<quad>$ = GeraQuadrupla (NOP, opndidle, opndidle, opndidle);}
                ABPAR   {printf ("enquanto ( ");}   Expressao  {
-					if ($4.tipo != LOGICAL)
+					if ($5.tipo != LOGICAL)
                	Incompatibilidade ("Expressao nao logica em comando enquanto");
+               opndaux.tipo = ROTOPND;
+               $<quad>$ = GeraQuadrupla (OPJF, $5.opnd, opndidle, opndaux);
 				}   FPAR   {printf (")\n");}   Comando
+               {
+                  opndaux.tipo = ROTOPND;
+                  opndaux.atr.rotulo = $<quad>2;
+                  GeraQuadrupla(OPJUMP, opndidle, opndidle, opndaux);
+                  $<quad>6->result.atr.rotulo = GeraQuadrupla(NOP, opndidle, opndidle, opndidle);
+               }
          ;
 CmdLer	:  LER   ABPAR   {printf ("ler ( ");}   ListVar
             {

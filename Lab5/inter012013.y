@@ -375,13 +375,17 @@ CmdAtrib :  Variavel  {
                                 ($1.simb->tvar == FLOAT && $5.tipo == LOGICAL) ||
                                 ($1.simb->tvar == LOGICAL && $5.tipo != LOGICAL))
                             Incompatibilidade ("Lado direito de comando de atribuicao improprio");
+                            GeraQuadrupla (OPATRIB, $5.opnd, opndidle, $1.opnd);
             }
          ;
 Expressao:  ExprAux1
             |  Expressao   OR   {printf ("|| ");}   ExprAux1  {
                 if ($1.tipo != LOGICAL || $4.tipo != LOGICAL)
                     Incompatibilidade   ("Operando improprio para OR");
-               $$.tipo = LOGICAL;
+                $$.tipo = LOGICAL;
+                $$.opnd.tipo = VAROPND;
+                $$.opnd.atr.simb = NovaTemp ($$.tipo);
+                GeraQuadrupla (OPOR, $1.opnd, $4.opnd, $$.opnd);
             }
          ;
 ExprAux1 :  ExprAux2
@@ -389,25 +393,31 @@ ExprAux1 :  ExprAux2
                 if ($1.tipo != LOGICAL || $4.tipo != LOGICAL)
                     Incompatibilidade   ("Operando improprio para AND");
                 $$.tipo = LOGICAL;
+                $$.opnd.tipo = VAROPND;
+                $$.opnd.atr.simb = NovaTemp ($$.tipo);
+                GeraQuadrupla (OPAND, $1.opnd, $4.opnd, $$.opnd);
             }
          ;
 ExprAux2 :  ExprAux3
             |  NOT  {printf ("! ");}   ExprAux3  {
                 if ($3.tipo != LOGICAL)
                     Incompatibilidade   ("Operando improprio para NOT");
-               $$.tipo = LOGICAL;
+                $$.tipo = LOGICAL;
+                $$.opnd.tipo = VAROPND;
+                $$.opnd.atr.simb = NovaTemp ($$.tipo);
+                GeraQuadrupla (OPNOT, $3.opnd, opndidle, $$.opnd);
             }
          ;
 ExprAux3 :  ExprAux4
             |  ExprAux4   OPREL   {
                 switch ($2) {
                 case LT: printf ("< "); break;
-                  case LE: printf ("<= "); break;
-                  case EQ: printf ("= "); break;
-                  case NE: printf ("!= "); break;
-                  case GT: printf ("> "); break;
-                  case GE: printf (">= "); break;
-               }
+                case LE: printf ("<= "); break;
+                case EQ: printf ("= "); break;
+                case NE: printf ("!= "); break;
+                case GT: printf ("> "); break;
+                case GE: printf (">= "); break;
+                }
             }   ExprAux4  {
                 switch ($2) {
                 case LT: case LE: case GT: case GE:
@@ -418,8 +428,24 @@ ExprAux3 :  ExprAux4
                     if (($1.tipo == LOGICAL || $4.tipo == LOGICAL) && $1.tipo != $4.tipo)
                         Incompatibilidade ("Operando improprio para operador relacional");
                      break;
-               }
-               $$.tipo = LOGICAL;
+                }
+                $$.tipo = LOGICAL;
+                $$.opnd.tipo = VAROPND;
+                $$.opnd.atr.simb = NovaTemp ($$.tipo);
+                switch ($2) {
+                    case LT: GeraQuadrupla (OPLT, $1.opnd, $4.opnd, $$.opnd);
+                    break;
+                    case LE: GeraQuadrupla (OPLE, $1.opnd, $4.opnd, $$.opnd);
+                    break;
+                    case EQ: GeraQuadrupla (OPEQ, $1.opnd, $4.opnd, $$.opnd);
+                    break;
+                    case NE: GeraQuadrupla (OPNE, $1.opnd, $4.opnd, $$.opnd);
+                    break;
+                    case GT: GeraQuadrupla (OPGT, $1.opnd, $4.opnd, $$.opnd);
+                    break;
+                    case GE: GeraQuadrupla (OPGE, $1.opnd, $4.opnd, $$.opnd);
+                    break;
+                }
             }
          ;
 ExprAux4 :  Termo
@@ -433,6 +459,11 @@ ExprAux4 :  Termo
                 Incompatibilidade   ("Operando improprio para operador aritmetico");
                 if ($1.tipo == FLOAT || $4.tipo == FLOAT) $$.tipo = FLOAT;
                 else $$.tipo = INTEGER;
+                $$.opnd.tipo = VAROPND;
+                $$.opnd.atr.simb = NovaTemp ($$.tipo);
+                if ($2 == MAIS)
+                    GeraQuadrupla (OPMAIS, $1.opnd, $4.opnd, $$.opnd);
+                else GeraQuadrupla (OPMENOS, $1.opnd, $4.opnd, $$.opnd);
             }
          ;
 Termo   :   Fator

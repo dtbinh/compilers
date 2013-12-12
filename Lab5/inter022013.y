@@ -211,13 +211,15 @@ struct infovariavel {
    simbolo simb;
 	infoexpressao infoexpr;
 	infovariavel infovar;
-   int nsubscr;
+   int nsubscr, nargs;
+   quadrupla quad;
 }
 
 /* Declaracao dos atributos dos tokens e dos nao-terminais */
 
+%type       <nargs>     ListVar ListEscr
 %type 		<infoexpr> 	Expressao  ExprAux1 ExprAux2
-								ExprAux3   ExprAux4   Termo   Fator
+								ExprAux3   ExprAux4   Termo   Fator ElemEscr
 %type			<infovar>		Variavel
 %type			<nsubscr> 	ListSubscr
 %token		<cadeia>		ID
@@ -337,33 +339,85 @@ Comando  :  CmdComp
 CmdSe		:  SE   ABPAR   {printf ("se ( ");}   Expressao  {
 					if ($4.tipo != LOGICAL)
                	Incompatibilidade ("Expressao nao logica em comando se");
-				}  FPAR  {printf (")\n");}   Comando   CmdSenao
+               opndaux.tipo = ROTOPND;
+               $<quad>$ =GeraQuadrupla (OPJF, $4.opnd, opndidle, opndaux);
+				}  FPAR  {printf (")\n");}   Comando
+            {
+               $<quad>$ = quadcorrente;
+               $<quad>5->result.atr.rotulo=GeraQuadrupla (NOP, opndidle, opndidle, opndidle);
+            }
+            CmdSenao
+            {
+               if ($<quad>9->prox != quadcorrente) {
+                  quadaux = $<quad>9->prox;
+                  $<quad>9->prox = quadaux->prox;
+                  quadaux->prox = $<quad>9->prox->prox;
+                  $<quad>9->prox->prox = quadaux;
+                  RenumQuadruplas ($<quad>9, quadcorrente);
+               }
+            }
          ;
 CmdSenao	:
-			|  SENAO   {printf ("senao\n");}   Comando
+			|  SENAO
+         {
+            printf ("senao\n");
+            opndaux.tipo = ROTOPND;
+            $<quad>$ = GeraQuadrupla (OPJUMP, opndidle, opndidle,opndaux);
+         }   Comando
+         {
+            $<quad>2->result.atr.rotulo = GeraQuadrupla (NOP, opndidle, opndidle, opndidle);
+         }
          ;
-CmdEnquanto:	ENQUANTO   ABPAR   {printf ("enquanto ( ");}   Expressao  {
+CmdEnquanto:	ENQUANTO
+               ABPAR   {printf ("enquanto ( ");}   Expressao  {
 					if ($4.tipo != LOGICAL)
                	Incompatibilidade ("Expressao nao logica em comando enquanto");
 				}   FPAR   {printf (")\n");}   Comando
          ;
 CmdLer	:  LER   ABPAR   {printf ("ler ( ");}   ListVar
+            {
+               opnd1.tipo = INTOPND;
+               opnd1.atr.valint = $4;
+               GeraQuadrupla (OPREAD, opnd1, opndidle, opndidle);
+            }
 				FPAR   PVIRG   {printf (") ;\n");}
          ;
 ListVar	:  Variavel  {
 					if  ($1.simb != NULL) $1.simb->inic = $1.simb->ref = TRUE;
+               $$ = 1;
+               GeraQuadrupla (PARAM, $1.opnd, opndidle, opndidle);
 				}
 			|  ListVar   VIRG  {printf (", ");}   Variavel  {
 					if  ($4.simb != NULL) $4.simb->inic = $4.simb->ref = TRUE;
+               $$ = $1 + 1;
+               GeraQuadrupla (PARAM, $4.opnd, opndidle, opndidle);
 				}
          ;
 CmdEscrever:	ESCREVER   ABPAR   {printf ("escrever ( ");}   ListEscr
+               {
+                  opnd1.tipo = INTOPND;
+                  opnd1.atr.valint = $4;
+                  GeraQuadrupla (OPWRITE, opnd1, opndidle, opndidle);
+               }
 				FPAR   PVIRG   {printf (") ;\n");}
          ;
 ListEscr	:	ElemEscr
+            {
+               $$ = 1;
+               GeraQuadrupla (PARAM, $1.opnd, opndidle, opndidle);
+            }
 			|  ListEscr   VIRG  {printf (", ");}   ElemEscr
+         {
+            $$ = $1 + 1;
+            GeraQuadrupla (PARAM, $4.opnd, opndidle, opndidle);
+         }
          ;
-ElemEscr	:  CADEIA  {printf ("\"%s\" ", $1);}
+ElemEscr	:  CADEIA  {
+               printf ("\"%s\" ", $1);
+               $$.opnd.tipo = CADOPND;
+               $$.opnd.atr.valcad = malloc (strlen($1) + 1);
+               strcpy ($$.opnd.atr.valcad, $1);
+            }
 			|  Expressao
          ;
 CmdAtrib :  Variavel  {

@@ -127,7 +127,8 @@ void NaoEsperado (char *);
 %token                  VERDADE
 %%
 Prog            :   {InicTabSimb();}
-                    PROGRAMA   ID   PVIRG {printf("programa %s;\n", $3); InsereSimb($3, IDPROG, NOTVAR);}
+                    PROGRAMA   ID   PVIRG
+                    {printf("programa %s;\n", $3); InsereSimb($3, IDPROG, NOTVAR);}
                     Decls    SubProgs   CmdComp
                     {VerificaInicRef(); ImprimeTabSimb();}
 
@@ -276,13 +277,28 @@ CmdAtrib        :   {tabular();} Variavel
 ListExpr        :   Expressao   |   ListExpr   VIRG {printf(", ");}   Expressao
 
 Expressao       :   ExprAux1
-                |   Expressao   OR {printf(" || ");}  ExprAux1 
+                |   Expressao   OR {printf(" || ");}  ExprAux1
+                {
+                    if ($1 != LOGICAL || $4 != LOGICAL)
+                        Incompatibilidade   ("Operando improprio para OR");
+                    $$ = LOGICAL;
+                }
                 
 ExprAux1        :   ExprAux2
                 |   ExprAux1   AND {printf(" && ");} ExprAux2 
+                {
+                    if ($1 != LOGICAL || $4 != LOGICAL)
+                        Incompatibilidade   ("Operando improprio para AND");
+                    $$ = LOGICAL;
+                }
 
 ExprAux2        :   ExprAux3
                 |   NOT {printf("!");} ExprAux3 
+                 {
+                    if ($3 != LOGICAL)
+                        Incompatibilidade   ("Operando improprio para NOT");
+                    $$ = LOGICAL;
+                }
                 
 ExprAux3        :   ExprAux4
                 |   ExprAux4   OPREL {
@@ -308,6 +324,19 @@ ExprAux3        :   ExprAux4
                         }
                     }
                     ExprAux4
+                    {
+                        switch ($2) {
+                        case LT: case LE: case GT: case GE:
+                            if ($1 != INTEGER && $1 != FLOAT && $1 != CHAR || $4 != INTEGER && $4!=FLOAT && $4!=CHAR)
+                                Incompatibilidade   ("Operando improprio para operador relacional");
+                            break;
+                        case EQ: case NE:
+                            if (($1 == LOGICAL || $4 == LOGICAL) && $1 != $4)
+                                Incompatibilidade ("Operando improprio para operador relacional");
+                            break;
+                        }
+                        $$ = LOGICAL;
+                    }
                 
 ExprAux4        :   Termo
                 |   ExprAux4   OPAD  {
@@ -365,12 +394,10 @@ Fator           :   Variavel
                 |   FALSO {printf("falso");$$ = LOGICAL;}
                 |   NEG {printf("~");} Fator
                 {
-                    {
-                        if ($3 != INTEGER && $3 != FLOAT && $3 != CHAR)
-                            Incompatibilidade ("Operando improprio para menos unario");
-                        if ($3 == FLOAT) $$ = FLOAT;
-                        else $$ = INTEGER;
-                    }
+                    if ($3 != INTEGER && $3 != FLOAT && $3 != CHAR)
+                        Incompatibilidade ("Operando improprio para menos unario");
+                    if ($3 == FLOAT) $$ = FLOAT;
+                    else $$ = INTEGER;
                 }
                 |   ABPAR {printf("\( ");}
                     Expressao

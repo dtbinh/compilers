@@ -1,0 +1,17 @@
+programa teste1;
+var
+	int a, d, m, i, j;
+    logic l1, l2, lol;
+	real k, r;
+{
+	a := ~4;
+	i := 100;
+	d := ~a*3;
+	j := 5;
+	k := a / j;
+	m := a % j;
+	r := a/2 + 1.1;
+	l2 := verdade;
+	lol := l1 && !l2;
+	l2 := lol || (a > i && j+2 = i);
+}

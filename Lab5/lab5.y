@@ -51,6 +51,7 @@
 #define     PARAM       21
 #define     OPREAD      22
 #define     OPWRITE     23
+#define     OPJT        24
 
 #define     IDLEOPND    0
 #define     VAROPND     1
@@ -75,10 +76,10 @@ char *nometipid[5] = {" ", "IDPROG", "IDVAR", "IDFUNC", "IDPROC"};
 char *nometipvar[5] = {"NOTVAR","INTEGER", "LOGICAL", "FLOAT", "CHAR"
 };
 
-char *nomeoperquad[24] = {"","OR", "AND", "LT", "LE", "GT", "GE",
+char *nomeoperquad[25] = {"","OR", "AND", "LT", "LE", "GT", "GE",
  "EQ", "NE", "MAIS",  "MENOS", "MULT", "DIV", "RESTO", "MENUN", 
  "NOT", "ATRIB", "OPENMOD", "NOP", "JUMP", "JF", "PARAM", "READ", 
- "WRITE"
+ "WRITE", "JT"
 };
 
 char *nometipoopndquad[9] = {"IDLE","VAR", "INT", "REAL", "CARAC",
@@ -136,7 +137,7 @@ struct celmodhead {
     int modtip; quadrupla listquad;
 };
 
-quadrupla quadcorrente, quadaux;
+quadrupla quadcorrente, quadaux, quadaux2;
 modhead codintermed, modcorrente;
 int oper, numquadcorrente;
 operando opnd1, opnd2, result, opndaux;
@@ -178,7 +179,7 @@ struct infovariavel {
 
 
 %type       <nargs>     ListVar ListEscr
-%type       <infoexpr>  Expressao  ExprAux1 ExprAux2 ExprAux3 ExprAux4   Termo   Fator ElemEscr
+%type       <infoexpr>  ExprAux1 ExprAux2 ExprAux3 ExprAux4   Termo   Fator ElemEscr Expressao
 %type       <infovar>      Variavel
 %type       <nsubscr>   ListSubscr
 %type       <cadeia>    ChamaProc
@@ -375,15 +376,49 @@ CmdEnquanto     :   ENQUANTO
                         opndaux.atr.rotulo = $<quad>2;
                         GeraQuadrupla(OPJUMP, opndidle, opndidle, opndaux);
                         $<quad>6->result.atr.rotulo = GeraQuadrupla(NOP, opndidle, opndidle, opndidle);
-                    }
+                        }
 
-CmdRepetir      :   REPETIR {tabular();printf ("repetir\n");}  Comando
-                    ENQUANTO  ABPAR {tabular();printf ("enquanto\(");}  Expressao   FPAR   PVIRG {printf (");\n");}
+CmdRepetir      :   REPETIR
+                    {
+                        tabular();printf ("repetir\n");
+                        $<quad>$ = GeraQuadrupla (NOP, opndidle, opndidle, opndidle);
+                    }  Comando
+                    ENQUANTO  ABPAR {tabular();printf ("enquanto\(");}  Expressao
+                    {
+                        if($7.tipo != LOGICAL)
+                            Incompatibilidade("Expressao nao logica na condicao do REPETIR");
+                        opndaux.tipo = ROTOPND;
+                        opndaux.atr.rotulo = $<quad>2;
+                        GeraQuadrupla (OPJT, $7.opnd, opndidle, opndaux);
+                    }
+                    FPAR   PVIRG {printf (");\n");}
 
 CmdPara         :   PARA   ABPAR {tabular();printf ("para\(");}  
-                    Comando  Variavel   ATRIB {printf(":= ");}  Expressao
-                    PVIRG {printf(",");}  Expressao   PVIRG {printf(",");}
-                    Variavel   ATRIB {printf(":= ");}  Expressao   FPAR {printf(")\n");}  Comando
+                    Variavel   ATRIB {printf(":= ");}  Expressao
+                    PVIRG {
+                        printf(";");
+                        $<quad>$ = GeraQuadrupla (NOP, opndidle, opndidle, opndidle);
+                    }  Expressao
+                    {
+                        if($10.tipo != LOGICAL)
+                            Incompatibilidade("Expressao nao logica na condicao do PARA");
+                        opndaux.tipo = ROTOPND;
+                        $<quad>$ = GeraQuadrupla (OPJF, $10.opnd, opndidle, opndaux);
+                    }
+                    PVIRG {
+                        printf(";");
+                        $<quad>$ = GeraQuadrupla (NOP, opndidle, opndidle, opndidle);
+                    }
+                    Variavel   ATRIB {printf(":= ");}  Expressao   FPAR {printf(")\n");}
+                    { $<quad>$ = quadcorrente; }
+                    { $<quad>$ = GeraQuadrupla (NOP, opndidle, opndidle, opndidle); }
+                    Comando
+                    {
+                    quadaux = quadcorrente;
+                    opndaux.tipo = ROTOPND; opndaux.atr.rotulo = $<quad>9;
+                    quadaux2 = GeraQuadrupla (OPJUMP, opndidle, opndidle, opndaux);
+                    $<quad>11->result.atr.rotulo = GeraQuadrupla(NOP, opndidle, opndidle, opndidle);
+                    }
 
 CmdLer          :   LER  ABPAR {tabular();printf ("ler\(");}   ListVar
                     {

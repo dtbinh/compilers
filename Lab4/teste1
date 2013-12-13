@@ -1,0 +1,34 @@
+programa simples;
+
+var
+    logic a, b, c;
+    int x, y;
+    carac B[2,2], d;
+    carac array[50], matriz[50,10];
+    int intmat[40,10,20,5];
+
+funcao int teste();{
+    x := 5;
+    retornar x;
+}
+
+procedimento proc();{
+    x := 5;
+    y :=2;
+}
+
+{
+    b := falso;
+    c := verdade;
+    ler(d);
+    intmat[2,2,2,2] := 10;
+    ler(array[1]);
+    ler(matriz[10,10]);
+    ler(B[1,1]);
+    a := verdade;
+    escrever(a, b, "isto");
+    {
+        y := teste();
+        x := 3 + y;
+    }
+}

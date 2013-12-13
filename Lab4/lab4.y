@@ -233,11 +233,21 @@ CmdEnquanto     :   ENQUANTO {tabular();printf ("enquanto");}
                     FPAR {printf(" )\n");}  Comando
 
 CmdRepetir      :   REPETIR {tabular();printf ("repetir\n");}  Comando
-                    ENQUANTO  ABPAR {tabular();printf ("enquanto\(");}  Expressao   FPAR   PVIRG {printf (");\n");}
+                    ENQUANTO  ABPAR {tabular();printf ("enquanto\(");}  Expressao
+                    {
+                        if($7 != LOGICAL)
+                            Incompatibilidade("Expressao nao logica na condicao do REPETIR");
+                    }
+                    FPAR   PVIRG {printf (");\n");}
 
 CmdPara         :   PARA   ABPAR {tabular();printf ("para\(");}  
-                    Comando  Variavel   ATRIB {printf(":= ");}  Expressao
-                    PVIRG {printf(",");}  Expressao   PVIRG {printf(",");}
+                    Variavel   ATRIB {printf(":= ");}  Expressao
+                    PVIRG {printf(";");}  Expressao
+                    {
+                        if($11 != LOGICAL)
+                            Incompatibilidade("Expressao nao logica na condicao do PARA");
+                    }
+                    PVIRG {printf(";");}
                     Variavel   ATRIB {printf(":= ");}  Expressao   FPAR {printf(")\n");}  Comando
 
 CmdLer          :   LER  ABPAR {tabular();printf ("ler\(");} ListVar   FPAR   PVIRG {printf (");\n");}
